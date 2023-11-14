@@ -2,51 +2,41 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define BUFFER_SIZE 1024
 
 /**
- * main - a shell program that Handles command lines with arguments
- * Return: Always 0
+ * execute_command - Hhandling command lines with arguments.
+ * @command: The command to be executed.
  */
-int main(void)
-{
-char command[BUFFER_SIZE];
+void execute_command(char *command);
 
-while (1)
-{
-printf("c programming is fun");
+int main(void) {
+    char command[BUFFER_SIZE];
 
-if (!fgets(command, BUFFER_SIZE, stdin) || command[0] == '\n')
-{
-break;
-}
+    while (1) {
+        if (isatty(STDIN_FILENO)) {
+            printf("#cisfun$ ");
+            fflush(stdout);
+        }
 
-command[strcspn(command, "\n")] = '\0';
-char *args[BUFFER_SIZE / 2];
-int i = 0;
-char *token = strtok(command, " ");
-while (token != NULL && i < BUFFER_SIZE / 2 - 1)
+        if (!fgets(command, BUFFER_SIZE, stdin) || command[0] == '\n') {
+            break;
+        }
 
-{
-args[i] = token;
-token = strtok(NULL, " ");
-i++;
-}
+        command[strcspn(command, "\n")] = '\0';
 
-args[i] = NULL;
-if (fork() == 0)
-{
-if (execve(args[0], args) == -1)
-{
-perror("Error");
-exit(EXIT_FAILURE);
-}
-}
-else
-{
-wait(NULL);
-}
-}
-return (0);
+        if (fork() == 0) {
+            char *args[] = {command, NULL};
+            if (execvp(command, args) == -1) {
+                perror(command);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            wait(NULL);
+        }
+    }
+
+    return 0;
 }
