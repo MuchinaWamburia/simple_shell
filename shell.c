@@ -7,36 +7,35 @@
 #define BUFFER_SIZE 1024
 
 /**
- * main - a shell program that executes user commands
- * Return: Always 0
+ * execute_command - Executes the given command.
+ * @command: The command to be executed.
  */
-int main(void)
-{
-char command[BUFFER_SIZE];
-char *args[2];
+void execute_command(char *command);
 
-while (1)
-{
-printf("C programming is fun");
+int main(void) {
+    char command[BUFFER_SIZE];
 
-if (!fgets(command, BUFFER_SIZE, stdin) || command[0] == '\n')
-{
-break;
-}
+    while (1) {
+        if (isatty(STDIN_FILENO)) {
+            printf("#cisfun$ ");
+            fflush(stdout);
+        }
 
-command[strcspn(command, "\n")] = '\0';
-if (fork() == 0)
-{
-if (execve(command, args, NULL) == -1)
-{
-perror("Error");
-exit(EXIT_FAILURE);
-}
-}
-else
-{
-wait(NULL);
-}
-}
-return (0);
+        if (!fgets(command, BUFFER_SIZE, stdin) || command[0] == '\n') {
+            break;
+        }
+
+        command[strcspn(command, "\n")] = '\0';
+
+        if (fork() == 0) {
+            if (execlp(command, command, (char *)NULL) == -1) {
+                perror(command);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            wait(NULL);
+        }
+    }
+
+    return 0;
 }
