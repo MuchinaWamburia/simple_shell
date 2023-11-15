@@ -6,7 +6,6 @@ int main(void)
 
     while (1)
     {
-
         if (isatty(STDIN_FILENO))
         {
             printf("#cisfun$ ");
@@ -22,11 +21,7 @@ int main(void)
 
         if (fork() == 0)
         {
-            char *args[2];
-            args[0] = command;
-            args[1] = NULL;
-
-            if (execvp(command, args) == -1)
+            if (execlp(command, command, (char *)NULL) == -1)
             {
                 perror(command);
                 exit(EXIT_FAILURE);
